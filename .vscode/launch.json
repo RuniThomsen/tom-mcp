@@ -1,0 +1,23 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			// F5-default: launch with dotnet watch + Hot Reload
+			"name": "tom-mcp (watch)",
+			"type": "coreclr",
+			"request": "launch",
+
+			// let the debugger run `dotnet watch run` for the current workspace
+			"watch": {
+				"command": "dotnet",
+				"args": [ "watch", "run" ]        // auto-restarts on edits
+			},
+
+			// enables Hot Reload for managed code
+			"hotReloadProfile": "dotnet",
+
+			// show app output in the integrated terminal
+			"console": "integratedTerminal"
+		}
+	]
+}

@@ -1,0 +1,23 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Log files
+*.log
+debug*.log
+
+# User-specific files
+*.user
+*.suo
+
+# VS Code
+.vscode/settings.json
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
