@@ -1,0 +1,97 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\repos\\tom-mcp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|c:\\repos\\tom-mcp\\tools\\xmlainfotools.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|solutionrelative:tools\\xmlainfotools.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|c:\\repos\\tom-mcp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|c:\\repos\\tom-mcp\\tools\\wrapperclasses\\testtoolwrapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|solutionrelative:tools\\wrapperclasses\\testtoolwrapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|c:\\repos\\tom-mcp\\tools\\listtoolstool.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{08857B51-35C6-2CC3-DA1F-45CB722F3D17}|tom-mcp.csproj|solutionrelative:tools\\listtoolstool.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ListToolsTool.cs",
+              "DocumentMoniker": "C:\\repos\\tom-mcp\\Tools\\ListToolsTool.cs",
+              "RelativeDocumentMoniker": "Tools\\ListToolsTool.cs",
+              "ToolTip": "C:\\repos\\tom-mcp\\Tools\\ListToolsTool.cs",
+              "RelativeToolTip": "Tools\\ListToolsTool.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-26T08:01:27.338Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TestToolWrapper.cs",
+              "DocumentMoniker": "C:\\repos\\tom-mcp\\Tools\\WrapperClasses\\TestToolWrapper.cs",
+              "RelativeDocumentMoniker": "Tools\\WrapperClasses\\TestToolWrapper.cs",
+              "ToolTip": "C:\\repos\\tom-mcp\\Tools\\WrapperClasses\\TestToolWrapper.cs",
+              "RelativeToolTip": "Tools\\WrapperClasses\\TestToolWrapper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-26T08:01:15.887Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "XmlaInfoTools.cs",
+              "DocumentMoniker": "C:\\repos\\tom-mcp\\Tools\\XmlaInfoTools.cs",
+              "RelativeDocumentMoniker": "Tools\\XmlaInfoTools.cs",
+              "ToolTip": "C:\\repos\\tom-mcp\\Tools\\XmlaInfoTools.cs",
+              "RelativeToolTip": "Tools\\XmlaInfoTools.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAnwCMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-26T10:18:42.883Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\repos\\tom-mcp\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\repos\\tom-mcp\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAGwAAAAAAAAAAAAwwIcAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-26T07:57:54.1Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -134,10 +134,15 @@ public static class TmdlValidateModelTools
         try
         {
             // For TE2, we'll use a simpler approach - just load the model and report basic statistics
-            var args = "\"" + tmdlPath + "\" -S";
-
-            var psi = new ProcessStartInfo(TePath, args)
+            // Clean the tmdlPath to ensure it doesn't contain illegal characters
+            string sanitizedPath = tmdlPath.Replace("\"", "").Trim();
+            var args = $"\"{sanitizedPath}\" -S";
+            
+            ReportProgress($"Launching TE2 with args: {args}");
+            
+            var psi = new ProcessStartInfo(TePath)
             {
+                Arguments = args,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,

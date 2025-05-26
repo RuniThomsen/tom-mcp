@@ -1,6 +1,7 @@
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
 using Tools;
+using TomMcp.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
@@ -8,18 +9,33 @@ using Microsoft.Extensions.Logging;
 
 // Need to make this a proper program with a Main method since we're returning values
 public class Program
-{
-    public static async Task<int> Main(string[] args)
-    {        // Check if we're running with --list-tools for legacy tool discovery
-        if (args.Length > 0 && args[0] == "--list-tools")
+{    public static async Task<int> Main(string[] args)
+    {        // Debug: log arguments to a file to understand what VS Code is passing
+        try
         {
-            Console.WriteLine("test_echo_v2");
-            Console.WriteLine("tmdl_list_tables");
-            Console.WriteLine("tmdl_list_measures");
-            Console.WriteLine("tmdl_detect_unused_columns");
-            Console.WriteLine("tmdl_validate_model");
+            var debugInfo = $"{DateTime.Now}: Args count: {args.Length}, Args: [{string.Join(", ", args)}], Process: {Environment.ProcessId}\n";
+            File.AppendAllText(@"c:\repos\tom-mcp\args_debug.log", debugInfo);
+        }
+        catch { /* ignore errors */ }
+          // Check if we're running with --list-tools for legacy tool discovery        
+        // DISABLED: MCP protocol doesn't support this legacy mode
+        if (false && args.Length > 0 && args[0] == "--list-tools")
+        {
+            try { File.AppendAllText(@"c:\repos\tom-mcp\args_debug.log", $"{DateTime.Now}: Entering --list-tools mode\n"); } catch { }
+            Console.Error.WriteLine("DEBUG: --list-tools mode detected");
+            Console.Error.WriteLine("test_echo_v2");
+            Console.Error.WriteLine("tmdl_list_tables");
+            Console.Error.WriteLine("tmdl_list_measures");
+            Console.Error.WriteLine("tmdl_detect_unused_columns");
+            Console.Error.WriteLine("tmdl_validate_model");
+            Console.Error.WriteLine("xmla_list_databases");
+            Console.Error.WriteLine("xmla_test_connection");
+            Console.Error.WriteLine("xmla_test_connection_noauth");
             return 0;
-        }        // Redirect debug output to stderr to avoid interfering with JSON-RPC
+        }
+        
+        // If we reach here, we should NOT be in --list-tools mode
+        try { File.AppendAllText(@"c:\repos\tom-mcp\args_debug.log", $"{DateTime.Now}: Continuing to MCP server mode\n"); } catch { }// Redirect debug output to stderr to avoid interfering with JSON-RPC
         TextWriter originalOut = Console.Out;
         Console.SetOut(Console.Error);
 
@@ -73,19 +89,23 @@ public class Program
                         // Disable logging for stdio mode to avoid interfering with JSON-RPC
                         logging.ClearProviders();
                         logging.SetMinimumLevel(LogLevel.Critical);
-                    })
-                    .ConfigureServices((hostContext, services) => 
+                    })                    .ConfigureServices((hostContext, services) => 
                     {
+                        // Add authentication services
+                        services.AddSingleton<AuthManager>();
+                        services.AddTransient<SsasConnector>();
+                        
                         // Add MCP server with stdio transport
                         var mcpBuilder = services.AddMcpServer()
                             .WithStdioServerTransport();                        // Register tools using wrapper classes for JSON-RPC compatibility
-                        mcpBuilder.WithTools<TestToolv2>();
+              
                         mcpBuilder.WithTools<Tools.WrapperClasses.TmdlValidateModelWrapper>();
                         mcpBuilder.WithTools<Tools.WrapperClasses.TmdlInfoWrapper>();
                         mcpBuilder.WithTools<Tools.WrapperClasses.TestToolWrapper>();
+                        mcpBuilder.WithTools<Tools.WrapperClasses.XmlaInfoWrapper>();
                         
                         // Also register from assembly for any other tools
-                        mcpBuilder.WithToolsFromAssembly(typeof(TmdlInfoTools).Assembly);                        
+                        mcpBuilder.WithToolsFromAssembly(typeof(TmdlInfoTools).Assembly);
                         log?.WriteLine("Registered tools for stdio server");
                     });
                     
@@ -94,29 +114,34 @@ public class Program
                 log?.WriteLine("Starting stdio MCP server");
                 await server.RunAsync();
                 return 0;
-            }
-              // HTTP mode setup
+            }            // HTTP mode setup
             log?.WriteLine("Setting up HTTP mode");
             var builder = WebApplication.CreateBuilder(args);
+            
+            // Add authentication services
+            builder.Services.AddSingleton<AuthManager>();
+            builder.Services.AddTransient<SsasConnector>();
             
             // Add MCP server with HTTP transport
             var mcpBuilder = builder.Services.AddMcpServer()
                 .WithHttpTransport();
 
 // Register tools using wrapper classes for JSON-RPC compatibility
-mcpBuilder.WithTools<TestToolv2>();
+
 mcpBuilder.WithTools<Tools.WrapperClasses.TmdlValidateModelWrapper>();
 mcpBuilder.WithTools<Tools.WrapperClasses.TmdlInfoWrapper>();
 mcpBuilder.WithTools<Tools.WrapperClasses.TestToolWrapper>();
 mcpBuilder.WithTools<Tools.WrapperClasses.BpaValidateWrapper>();
+mcpBuilder.WithTools<Tools.WrapperClasses.XmlaInfoWrapper>();
 
 // Also register from assembly for backwards compatibility
+mcpBuilder.WithToolsFromAssembly(typeof(TmdlInfoTools).Assembly);
 mcpBuilder.WithToolsFromAssembly(typeof(TmdlInfoTools).Assembly);
 
 var app = builder.Build();
 
 // Map the MCP endpoints
-Console.WriteLine("Mapping MCP endpoints");
+log?.WriteLine("Mapping MCP endpoints");
 app.MapMcp("/mcptools"); // Specify the endpoint explicitly
 
 // Add some diagnostic endpoints
@@ -127,7 +152,7 @@ app.MapGet("/debug/routes", () => {
 
 // Add a direct test endpoint for TestToolv2.Echo
 app.MapGet("/test-echo", () => {
-    var result = TestToolv2.Echo("Direct call without MCP");
+    var result = TestTool.Echo("Direct call without MCP");
     return result;
 });
 
@@ -176,7 +201,7 @@ app.MapGet("/test-validate", async (HttpContext context) => {
     }
 });
 
-Console.WriteLine("Starting MCP Server");
+log?.WriteLine("Starting MCP Server");
 app.Run();
             return 0;
         }        catch (Exception ex)
