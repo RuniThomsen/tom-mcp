@@ -9,28 +9,24 @@ namespace Tools.WrapperClasses;
 /// </summary>
 [McpServerToolType]
 public class TmdlInfoWrapper
-{
-    [McpServerTool(Name = "tmdl_list_tables")]
+{    [McpServerTool(Name = "tmdl_list_tables")]
     [Description("Lists all tables in a TMDL file")]
     public string ListTables(
         [Description("Path to the TMDL model folder or file")]
-        string tmdlPath,
-        CancellationToken cancellationToken = default)
+        string tmdlPath)
     {
         // Delegate to the existing static implementation
-        return TmdlInfoTools.ListTables(tmdlPath, cancellationToken);
+        return TmdlInfoTools.ListTables(tmdlPath, CancellationToken.None);
     }
 
     [McpServerTool(Name = "tmdl_list_measures")]
     [Description("Lists all measures in a specific table inside a TMDL file")]
     public string ListMeasures(
-        [Description("Path to the TMDL model folder or file")]
-        string tmdlPath,
+        [Description("Path to the TMDL model folder or file")]        string tmdlPath,
         [Description("Name of the table to list measures from")]
-        string table,
-        CancellationToken cancellationToken = default)
+        string table)
     {
         // Delegate to the existing static implementation
-        return TmdlInfoTools.ListMeasures(tmdlPath, table, cancellationToken);
+        return TmdlInfoTools.ListMeasures(tmdlPath, table, CancellationToken.None);
     }
 }

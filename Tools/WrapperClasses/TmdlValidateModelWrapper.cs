@@ -11,19 +11,15 @@ namespace Tools.WrapperClasses;
 /// </summary>
 [McpServerToolType]
 public class TmdlValidateModelWrapper
-{
-    [McpServerTool(Name = "tmdl_validate_model")]
+{    [McpServerTool(Name = "tmdl_validate_model")]
     [Description("Validate a TMDL model via Tabular Editor 2 (round-trip + BPA)")]
     public async Task<string> ValidateModel(
         [Description("Path to the TMDL model folder or file")]
         string tmdlPath,
         [Description("Optional path to BPA rules file")]
-        string? rulesPath = null,
-        [Description("Progress reporter for streaming validation results")]
-        IProgress<ProgressNotificationValue>? progress = null,
-        CancellationToken cancellationToken = default)
+        string? rulesPath = null)
     {
-        // Delegate to the existing static implementation
-        return await TmdlValidateModelTools.ValidateModel(tmdlPath, rulesPath, progress, cancellationToken);
+        // Delegate to the existing static implementation (without progress and cancellation token)
+        return await TmdlValidateModelTools.ValidateModel(tmdlPath, rulesPath, null, CancellationToken.None);
     }
 }

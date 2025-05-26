@@ -4,6 +4,7 @@ using ModelContextProtocol;
 using System.ComponentModel;
 using Microsoft.AnalysisServices.Tabular;
 using ModelHelpers;
+using System.Linq;
 
 namespace Tools;
 
@@ -36,50 +37,125 @@ public static class TmdlCreateModelTool
                 Total = null,
                 Message = message 
             });
-        }
-
-        try
+        }        try
         {
             ReportProgress($"Starting creation of model '{modelName}'...");
 
-            // Create new database and model
-            var database = new Database()
+            Database database;
+            Model model;
+            
+            // Try to load existing model first to preserve existing tables
+            if (Directory.Exists(outputPath))
             {
-                Name = modelName,
-                ID = modelName,
-                CompatibilityLevel = 1600 // Power BI Service compatibility
-            };
+                try
+                {
+                    ReportProgress("Loading existing model to preserve tables...");
+                    database = TmdlSerializer.DeserializeDatabaseFromFolder(outputPath);
+                    model = database.Model;
+                    ReportProgress($"✅ Loaded existing model with {model.Tables.Count} tables");
+                }
+                catch (Exception ex)
+                {
+                    ReportProgress($"⚠️ Could not load existing model ({ex.Message}), creating new one...");
+                    // Create new database and model if loading fails
+                    database = new Database()
+                    {
+                        Name = modelName,
+                        ID = modelName,
+                        CompatibilityLevel = 1600 // Power BI Service compatibility
+                    };
 
-            var model = new Model()
-            {
-                Name = modelName,
-                Description = "RESTART: Account Look Up migration from SSAS to fresh Common Semantic Model - Dev_TEST environment",
-                Culture = "en-US",
-                DefaultPowerBIDataSourceVersion = PowerBIDataSourceVersion.PowerBI_V3
-            };
+                    model = new Model()
+                    {
+                        Name = modelName,
+                        Description = "Account Look Up migration from SSAS to fresh Common Semantic Model - Dev_TEST environment",
+                        Culture = "en-US",
+                        DefaultPowerBIDataSourceVersion = PowerBIDataSourceVersion.PowerBI_V3
+                    };
 
-            database.Model = model;
-            ReportProgress("✅ Created base model structure");            // Create structured data source
-            var dataSource = new StructuredDataSource()
+                    database.Model = model;
+                }
+            }
+            else
             {
-                Name = "Databricks"
-            };
-            model.DataSources.Add(dataSource);
-            ReportProgress("✅ Added Databricks data source");// Create GLEntry fact table
-            CreateGLEntryTable(model, dataSource, databricksServer, warehousePath);
-            ReportProgress("✅ Created GLEntry fact table");
+                // Create new database and model
+                database = new Database()
+                {
+                    Name = modelName,
+                    ID = modelName,
+                    CompatibilityLevel = 1600 // Power BI Service compatibility
+                };
+
+                model = new Model()
+                {
+                    Name = modelName,
+                    Description = "Account Look Up migration from SSAS to fresh Common Semantic Model - Dev_TEST environment",
+                    Culture = "en-US",
+                    DefaultPowerBIDataSourceVersion = PowerBIDataSourceVersion.PowerBI_V3
+                };
+
+                database.Model = model;
+            }
+            
+            ReportProgress("✅ Model structure ready for enhancement");
+
+            // Ensure Databricks data source exists
+            var dataSource = model.DataSources.FirstOrDefault(ds => ds.Name == "Databricks");
+            if (dataSource == null)
+            {
+                dataSource = new StructuredDataSource()
+                {
+                    Name = "Databricks"
+                };
+                model.DataSources.Add(dataSource);
+                ReportProgress("✅ Added Databricks data source");
+            }
+            else
+            {
+                ReportProgress("✅ Using existing Databricks data source");
+            }// Create GLEntry fact table
+            if (model.Tables.Any(t => t.Name == "GLEntry"))
+            {
+                ReportProgress("✅ GLEntry table already exists, skipping");
+            }
+            else
+            {
+                CreateGLEntryTable(model, dataSource, databricksServer, warehousePath);
+                ReportProgress("✅ Created GLEntry fact table");
+            }
 
             // Create GLAccount dimension table
-            CreateGLAccountTable(model, dataSource, databricksServer, warehousePath);
-            ReportProgress("✅ Created GLAccount dimension table");
+            if (model.Tables.Any(t => t.Name == "GLAccount"))
+            {
+                ReportProgress("✅ GLAccount table already exists, skipping");
+            }
+            else
+            {
+                CreateGLAccountTable(model, dataSource, databricksServer, warehousePath);
+                ReportProgress("✅ Created GLAccount dimension table");
+            }
 
             // Create Date calculated table
-            CreateDateTable(model);
-            ReportProgress("✅ Created Date calculated table");
+            if (model.Tables.Any(t => t.Name == "Date"))
+            {
+                ReportProgress("✅ Date table already exists, skipping");
+            }
+            else
+            {
+                CreateDateTable(model);
+                ReportProgress("✅ Created Date calculated table");
+            }
 
             // Create Account calculated table
-            CreateAccountTable(model);
-            ReportProgress("✅ Created Account calculated table");
+            if (model.Tables.Any(t => t.Name == "Account"))
+            {
+                ReportProgress("✅ Account table already exists, skipping");
+            }
+            else
+            {
+                CreateAccountTable(model);
+                ReportProgress("✅ Created Account calculated table");
+            }
 
             // Create relationships
             CreateRelationships(model);
@@ -87,14 +163,14 @@ public static class TmdlCreateModelTool
 
             // Create core measures
             CreateCoreMeasures(model);
-            ReportProgress("✅ Created core measures");
-
-            // Save to TMDL
-            if (File.Exists(outputPath))
+            ReportProgress("✅ Created core measures");            // Save to TMDL using separated structure
+            if (!Directory.Exists(outputPath))
             {
-                File.Delete(outputPath);
+                Directory.CreateDirectory(outputPath);
             }
-              TmdlIo.Save(database, outputPath);
+            
+            // Use separated TMDL serialization
+            TmdlSerializer.SerializeDatabaseToFolder(database, outputPath);
             ReportProgress($"✅ Model saved to {outputPath}");
 
             return Task.FromResult(string.Join("\n", messages));
